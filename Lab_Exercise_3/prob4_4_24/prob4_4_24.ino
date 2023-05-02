@@ -3,6 +3,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Grades Evaluator");
   Serial.print("Exam1: ");
+
   while (!Serial.available()); // wait for user input
   String exm1 = Serial.readStringUntil('\n');
   float exam1 = exm1.toFloat();
@@ -26,16 +27,17 @@ void setup() {
   float exam4 = exm4.toFloat();
   Serial.println(exam4);
 
-
-  float ave = (exam1+exam2+exam3+exam4)/4;
-
   float arrayGrades[4] = {exam1, exam2, exam3, exam4};
 
+  // lowest grade
   float lowest = 101;
   for(int i = 0; i<4 ; i++){
     if (arrayGrades[i] < lowest)
         lowest = arrayGrades[i];
   }
+
+  // exam average 
+  float ave = (exam1+exam2+exam3+exam4-lowest)/3;
 
   Serial.print("Your lowest score was: ");
   Serial.println(lowest);
