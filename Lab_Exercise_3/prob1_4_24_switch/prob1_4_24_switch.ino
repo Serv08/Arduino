@@ -40,7 +40,7 @@ void loop() {
       sevenToNine(x);
       break;
 
-    case 8:
+    case 8:x`
       sevenToNine(x);
       break;
 
