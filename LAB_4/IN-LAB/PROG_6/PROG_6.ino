@@ -9,9 +9,6 @@ int button1_SWITCH = 10;
 int button2_SWITCH = 11;
 int button3_SWITCH = 12;
 
-unsigned long debounceDelay = 20;
-
-int pinRESET = 13;
 
 void setup() {
   Serial.begin(9600);
@@ -27,20 +24,10 @@ void setup() {
   pinMode(10, INPUT);     // pins for SWITCH inputs
   pinMode(11, INPUT);
   pinMode(12, INPUT);
-
-  pinMode(13, OUTPUT);    // for RESET PIN
 }
 
 
 void loop() {
-  int counter = 0;
-  int buttonState = 0;
-  int lastButtonState = 0;
-  int currentButtonState = 0;
-  unsigned long lastDebounceTime = 0;
-  // debounceSwitch(button1_SWITCH, counter, buttonState, lastButtonState, currentButtonState, lastDebounceTime, debounceDelay); // switch1 debouncing
-  // debounceSwitch(button2_SWITCH, counter, buttonState, lastButtonState, currentButtonState, lastDebounceTime, debounceDelay); // switch2 debouncing
-  // debounceSwitch(button3_SWITCH, counter, buttonState, lastButtonState, currentButtonState, lastDebounceTime, debounceDelay); // switch3 debouncing
 
   button1 = digitalRead(button1_SWITCH);
   button2 = digitalRead(button2_SWITCH);
@@ -59,25 +46,21 @@ void loop() {
     case 1:
       serialOutput(inputs);
       case_1();
-      // boardRESET(0);
       break;
 
     case 2:
       serialOutput(inputs);
       case_2();
-      // boardRESET(0);
       break;
 
     case 3:
       serialOutput(inputs);
       case_3();
-      // boardRESET(0);
       break;
 
     case 4:
       serialOutput(inputs);
       case_4();
-      // boardRESET(0);
       break;
 
 
@@ -86,7 +69,6 @@ void loop() {
       Serial.println(inputs);
       Serial.println("RESET");
       case_5();
-      // boardRESET(1);
       delay(1000);
       break;
   }
@@ -194,30 +176,4 @@ void on(){
 void serialOutput(int input){
   Serial.print("SWITCH CASE INPUT: ");
   Serial.println(input);
-}
-
-int debounceSwitch(int inputPin, int counter, int buttonState, int lastButtonState, int currentButtonState, long lastDebounceTime, long debounceDelay) {
-  currentButtonState = digitalRead(inputPin);
-
-  if (currentButtonState != lastButtonState) {
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    if (currentButtonState != buttonState) {
-      buttonState = currentButtonState;
-      if (buttonState == LOW) {
-        counter++;
-        Serial.println(counter);
-      }
-    }
-  }
-  return lastButtonState = currentButtonState;
-}
-
-void boardRESET(int STATUS){
-  if (STATUS == 0)
-    digitalWrite(pinRESET, HIGH);
-  else
-    digitalWrite(pinRESET, LOW);
 }
