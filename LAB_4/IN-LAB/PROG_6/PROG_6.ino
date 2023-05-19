@@ -1,14 +1,12 @@
+// PROGRAM 6
 int LEDS[8] = {2,3,4,5,6,7,8,9}; // pins for all 
 int i; // used for loops
-
 int button1;
 int button2;
 int button3;
-
 int button1_SWITCH = 10;
 int button2_SWITCH = 11;
 int button3_SWITCH = 12;
-
 
 void setup() {
   Serial.begin(9600);
@@ -20,22 +18,17 @@ void setup() {
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-
   pinMode(10, INPUT);     // pins for SWITCH inputs
   pinMode(11, INPUT);
   pinMode(12, INPUT);
 }
 
-
 void loop() {
-
   button1 = digitalRead(button1_SWITCH);
   button2 = digitalRead(button2_SWITCH);
   button3 = digitalRead(button3_SWITCH);
 
-
   int inputs = binaryToDecimal(button1, button2, button3);
-
   delay(1000);
 
   // MAIN SWITCH CASES
@@ -47,23 +40,18 @@ void loop() {
       serialOutput(inputs);
       case_1();
       break;
-
     case 2:
       serialOutput(inputs);
       case_2();
       break;
-
     case 3:
       serialOutput(inputs);
       case_3();
       break;
-
     case 4:
       serialOutput(inputs);
       case_4();
       break;
-
-
     default:
       Serial.print("INPUT OUT OF RANGE: ");
       Serial.println(inputs);
@@ -74,18 +62,17 @@ void loop() {
   }
 }
 
-
 // FUNCTIONS
 void case_1(){
   for (i = 0; i<4; i++){
-        doubleBlink(LEDS[3-i], LEDS[4+i]);
-      }
+    doubleBlink(LEDS[3-i], LEDS[4+i]);
+  }
 }
 
 void case_2(){
   for (i = 0; i<4; i++){
-          doubleBlink(LEDS[i], LEDS[7-i]);
-        }
+    doubleBlink(LEDS[i], LEDS[7-i]);
+  }
 }
 
 void case_3(){
@@ -95,7 +82,6 @@ void case_3(){
   for (i = 7; i>0; i = i-2){
     Blink(LEDS[i]);
   }
-  // off();
 }
 
 void case_4(){
@@ -103,7 +89,6 @@ void case_4(){
     Blink(LEDS[i]);
     Blink(LEDS[7-i]);
   }
-  // off();
 }
 
 void case_5(){
@@ -160,17 +145,6 @@ void off(){
   digitalWrite(7, LOW);
   digitalWrite(8, LOW);
   digitalWrite(9, LOW);
-}
-
-void on(){
-  digitalWrite(2, HIGH);
-  digitalWrite(3, HIGH);
-  digitalWrite(4, HIGH);
-  digitalWrite(5, HIGH);
-  digitalWrite(6, HIGH);
-  digitalWrite(7, HIGH);
-  digitalWrite(8, HIGH);
-  digitalWrite(9, HIGH);
 }
 
 void serialOutput(int input){

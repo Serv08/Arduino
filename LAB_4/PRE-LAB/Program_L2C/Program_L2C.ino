@@ -1,9 +1,9 @@
 //PROGRAM L2C
  //Student Number is 10860. Use N = 0 + 2
 void setup() {
-    pinMode(2, OUTPUT);
-    pinMode(3, OUTPUT);
-    pinMode(4, OUTPUT);
+    pinMode(2, OUTPUT); // RED
+    pinMode(3, OUTPUT); // BLUE
+    pinMode(4, OUTPUT); // GREEN
     
     Blink(2, 4);
     Blink(3, 6);

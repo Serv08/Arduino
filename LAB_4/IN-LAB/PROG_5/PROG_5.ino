@@ -1,19 +1,38 @@
 //PROGRAM 5
  //Student Number is 10860. Use N = 0 + 2
+
+int GREEN1 = 2;
+int YELLOW1 = 3;
+int RED1 = 4;
+
+int GREEN2 = 5;
+int YELLOW2 = 6;
+int RED2 = 7;
+
 void setup() {
-    pinMode(3, OUTPUT);
-    pinMode(4, OUTPUT);
-    pinMode(5, OUTPUT);
+    for (int i=2; i<=7; i++){
+      pinMode(i, OUTPUT);
+    }
     
 }
 void loop(){
-    Blink(3, 10000);  // GREEN
-    Blink(4, 1000); // YELLOW
-    Blink(5, 8000);  // RED
-}
+  digitalWrite(YELLOW2, LOW);
+  digitalWrite(RED1, LOW);
+  digitalWrite(GREEN1, HIGH);
+  digitalWrite(RED2, HIGH);
+  delay(10000);
 
-void Blink(int pin, int dly){ //function to call
-    digitalWrite(pin, HIGH);
-    delay(dly);
-    digitalWrite(pin, LOW);
+  digitalWrite(GREEN1, LOW);
+  digitalWrite(YELLOW1, HIGH);
+  delay(1000);
+
+  digitalWrite(RED1, HIGH);
+  digitalWrite(RED2, LOW);
+  digitalWrite(YELLOW1, LOW);
+  digitalWrite(GREEN2, HIGH);
+  delay(8000);
+
+  digitalWrite(YELLOW2, HIGH);
+  digitalWrite(GREEN2, LOW);
+  delay(1000);
 }
