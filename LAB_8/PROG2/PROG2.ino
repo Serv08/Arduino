@@ -38,14 +38,19 @@ void loop() {
 }
 
 void scrollMessage(int row, String message, int delayTime, int totalColumns) {
-  for (int i=totalColumns; i > 0; i--) { // exchange totalColumns and zero and increment 1 to i to change the direction to right to left
+  // exchange totalColumns and zero and increment 1 to i to change the direction to right to left
+  for (int i=totalColumns; i > 0; i--) { 
     message = " " + message; // to display spaces at the front of the message
   } 
   message = message + " "; // to display spaces before the message was displayed in lcd
-  for (int position = message.length(); position > 0; position--) { // exchange message.length and zero and increment 1 to position to change the direction to right to left
+  // exchange message.length and zero and increment 1 to position to change the direction to right to left
+  for (int position = message.length(); position > 0; position--) { 
     lcd.setCursor(0, row);
-    // look for index 'position' until 'position + totalColumns'
-    // to print each character in message in their right position while the message is moving 1 block at a time in lcd display
+    /* 
+    look for index 'position' until 'position + totalColumns'
+    to print each character in message in their right position 
+    while the message is moving 1 block at a time in lcd display
+    */
     lcd.print(message.substring(position, position + totalColumns)); 
     delay(delayTime);
   }

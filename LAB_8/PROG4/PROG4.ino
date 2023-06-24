@@ -2,9 +2,6 @@
 #include <Wire.h>
 #include <Keypad.h>
 
-// creation of class instance lcd
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-
 // keypad configuration
 const byte ROWS = 4; // number of rows on the keypad
 const byte COLS = 4; // number of columns on the keypad
@@ -20,7 +17,7 @@ byte rowPins[ROWS] = {9, 8, 7, 6};     // connect to the row pinouts of the keyp
 byte colPins[COLS] = {2,3,4,5};     // connect to the column pinouts of the keypad
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
-
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 int ledPins[] = {A3,A2,A1,A0,10}; // pins for the LEDs
 int numLeds = sizeof(ledPins) / sizeof(ledPins[0]);
@@ -37,7 +34,6 @@ void setup() {
   for (int i = 0; i < numLeds; i++) {
     pinMode(ledPins[i], OUTPUT);
   }
-
   // lcd initialization
   lcd.init();
   lcd.backlight();
@@ -127,13 +123,7 @@ void loop() {
     delay(10000);
     Serial.println("You can try again:");
   }
-
-  // Disable further keypad input if max attempts exceeded
-  // while () {
-  //   // Do nothing
-  // }
 }
-
 
 void playSuccessTone() {
   tone(buzzerPin, 1000, 500);
