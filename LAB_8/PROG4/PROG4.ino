@@ -19,11 +19,11 @@ byte colPins[COLS] = {2,3,4,5};     // connect to the column pinouts of the keyp
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-int ledPins[] = {A3,A2,A1,A0,10}; // pins for the LEDs
+int ledPins[] = {A1,A0,10,11,12}; // pins for the LEDs
 int numLeds = sizeof(ledPins) / sizeof(ledPins[0]);
 int ledDelay = 100; // delay between LED shifts
 
-const int buzzerPin = 11; // pin for the buzzer
+const int buzzerPin = 13; // pin for the buzzer
 
 const String password = "*1234"; // the correct password
 const int maxAttempts = 3; // maximum number of password attempts
