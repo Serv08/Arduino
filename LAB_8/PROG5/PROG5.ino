@@ -28,7 +28,6 @@ uint8_t heartChar[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
 // ENEMY
 uint8_t enemyChar[8] = {0x00,0x07,0x05,0x1A,0x0E,0x02,0x06,0x05};
 
-
 uint8_t bulletChar[8] = {0x00,0x00,0x00,0x18,0x18,0x00,0x00,0x00};
 
 // CAR
@@ -46,15 +45,20 @@ int life = 3;
 
 int bulletDistance = 9;
 int counterForFirstLoop = 0;
-int deathPoint = 2;
+int carDeathPoint = 3;
 
 
 int bulletRowPosition;
 
 
-long prevTimeInMillis = 0;
-long prevTimeInSeconds = 0;
-long prevTime = 0;
+long unsigned prevTimeInMillis = 0;
+long unsigned prevTime = 0;
+long unsigned parentPrevTime = 0;
+long unsigned childPrevTime = 0;
+bool playAgain;
+
+
+int lives = 3;
 
 void setup() {
   Serial.begin(9600);
@@ -72,8 +76,8 @@ void setup() {
   racecar(topRow); // only for display
 
   // lives remaining
-  lcd.home();
-  lcd.print("XX");
+  // lcd.home();
+  // lcd.print("XX");
   // lcd.printByte(7);
 
   // score
@@ -89,38 +93,91 @@ void loop() {
   long timeInSeconds = timeInMillis /1000;
 
   // CHANGING VARIABLES PER LOOP
-  char key = keypad.getKey(); // initialization of keypad
-  int enemyRandomPosition = random(0,2); 
+  char key = keypad.getKey(); // checks  keypad input everytime (every loop)
+  int enemyRandomPosition = random(0,2); // generates random enemy (and bullet) row position
+  int bulletHit = 0;  // bullet column position at deathpoint
+
 
   // score
   lcd.setCursor(0, botRow);
   lcd.print(timeScore(timeInSeconds));
 
-
   int carPositionFromKey = carMovement(key);
-  // SERIAL DIAGNOSTICS
-  Serial.print("time: ");
-  Serial.print(timeInSeconds);
-
-
+  
   int enemyBullet = enemy(enemyRandomPosition, timeInMillis);
   // SERIAL DIAGNOSTICS
-  Serial.print("\t|enemyBullet: "); // COMMENTOUT (use CTRL + F)
-  Serial.print(enemyBullet); // COMMENTOUT (use CTRL + F)
+  Serial.print("|enemyBullet: "); 
+  Serial.print(enemyBullet); 
 
 
-  int bulletCollision = bulletMovement(enemyRandomPosition, carPositionFromKey, timeInMillis);
-  // SERIAL DIAGNOSTICS
-  Serial.print("\t|bulletColPos: "); 
-  Serial.print(bulletCollision); 
+  long parentLoopInterval = 800;
+  long childLoopInterval = 200;
+  Serial.print(" |bullet movement loop... ");
+  // if((timeInMillis - parentPrevTime) >= parentLoopInterval){ // bullet moves one column; millis acts as delay (millis delay)
+
+  
+  int bulletEndRange = 1;
+  for ( int bulletColPos = 14; bulletColPos > bulletEndRange; bulletColPos--){
+    lcd.setCursor(bulletColPos, enemyBullet);
+    lcd.printByte(4);
+
+    // HI, I'M THE PROBLEM, IT'S ME
+    for (int bulletDisplacement = 14; bulletDisplacement > bulletColPos; bulletDisplacement--){ // prints the displacement (" ") of the bullet
+      // if((timeInMillis - childPrevTime) >= childLoopInterval){ // bullet moves one column; millis acts as delay (millis delay)
+      lcd.setCursor(bulletColPos + 1, enemyBullet);
+      lcd.print(" ");
+    }
+    if (bulletColPos == 3){
+      bulletHit = bulletColPos;
+    }
+  }
 
 
-  // TODO: CHANGE bulletRowPosition. Should be if (carPosition == bulletRowPosition AFTER (n time bullet traveled))
-  // if ((bulletCollision == deathPoint) && (carPositionFromKey == enemyRandomPosition)){
-  //   Serial.print("  Status: Dead# ");
-  // } else {
-  //   Serial.print("  Status: Alive ");
-  // }
+  // SERIAL DIAGNOSTICS: prints the value of bullet column position
+  Serial.print(" |BulletHit: ");
+  Serial.print(bulletHit);
+  if ((bulletHit == carDeathPoint) && (carPositionFromKey == enemyRandomPosition)){
+    // lcd.blink();
+    // delay(1000);
+    // deathSound(); // todo: death sound function
+    lives--;
+    Serial.print("  Status: Dead# ");
+    lcd.clear();
+    lcd.home();
+    lcd.print("  You are hit!");
+    lcd.setCursor(2, 1);
+    lcd.print(lives);
+    lcd.print(" lives left");
+    delay(1000);
+    lcd.clear();
+  } else {
+    Serial.print("  Status: Alive ");
+  }
+
+  Serial.print("  Lives: ");
+  Serial.print(lives);
+  
+  if (lives == 0){
+    Serial.println();
+    Serial.print("GAME OVER");
+    lcd.clear();
+    lcd.setCursor(6, 0);
+    lcd.print("GAME");
+    lcd.setCursor(6, 1);
+    lcd.print("OVER");
+    while(!Serial.available());
+  //   do{
+  //     if (!key){
+  //       playAgain = false;
+  //     } else {
+  //       lcd.clear();
+  //       lcd.setCursor(3, 0);
+  //       lcd.print("DO YOU WANT ");
+  //       lcd.print(" TO PLAY AGAIN?");
+  //       delay(500);
+  //     }
+  //   } while (playAgain);
+  }
 
   // SERIAL DIAGNOSTICS
   Serial.print(" |CarPosition: ");
@@ -132,28 +189,29 @@ void loop() {
     Serial.print("(uupp)");
   }
   Serial.print(" |bulletRowPosition: ");
-  Serial.print(bulletRowPosition);
+  Serial.print(enemyBullet);
   Serial.print(" |enemyPosition: ");
   Serial.print(enemyBullet);
-  Serial.println();
-
-  // prevTimeInMillis = timeInMillis;
-  // prevTimeInSeconds = timeInSeconds;
-
+  Serial.print(" |time: ");
+  Serial.print(timeInSeconds);
+  Serial.println(); // new line
 }
+
+
+
 
 // carMovement func: FUNCTION FOR THE MOVEMENT OF THE CAR; returns value of the current car position
 int carMovement(char key){
   int carPosition;
   if (key){
     if (key == '2'){
-      Serial.println("racecar up");
+      Serial.println("#######################          racecar up            #######################");
       racecar(0);
       lcd.setCursor(2, 1);
       lcd.print("  ");
       return carPosition = 0;
     } else if (key == '8'){
-      Serial.println("racecar down");
+      Serial.println("#######################          racecar down          #######################");
       racecar(1);
       lcd.setCursor(2, 0);
       lcd.print("  ");
@@ -174,7 +232,7 @@ void racecar(int position){
 int enemy(int enemyPosition, long time){
   // Serial.println(cue);
   long cue = time;
-  long interval = 500;
+  long interval = 1000;
   if ((cue - prevTime) >= interval){ // TODO: ADJUST THE TELEPORTATION SKILL OF ENEMY GUNNER
     // SERIAL DIAGNOSTICS
     // Serial.print("Time of position change: ");
@@ -195,51 +253,40 @@ int enemy(int enemyPosition, long time){
       // return enemyPosition = 1;
     }
     prevTime = cue;
+    return enemyPosition;
   }  
-  return enemyPosition;
 }
 
 
 // bulletMovement func: MOVEMENT OF BULLET PER FRAME: uses marquee effect. Returns Bullet Column position
-int bulletMovement(int bulletRowPosition, int carPosition, long currentTime) {
-  // Serial.print(" | millis delay... time: ");
-  // Serial.print(currentTime*1000);
-  int bulletEndRange = 1;
-  // if ((currentTime % 2) == 0){
-    for ( int bulletColPos = 14; bulletColPos > bulletEndRange; bulletColPos--){
-        // int startingTime = currentTime; // time of the nth loop starts
-        lcd.setCursor(bulletColPos, bulletRowPosition);
-        lcd.printByte(4);
+// int bulletMovement(int bulletRowPosition, int carPosition, long currentTime) {
+//   // Serial.print(" | millis delay... time: ");
+//   // Serial.print(currentTime*1000);
+//   int bulletEndRange = 1;
+//   for ( int bulletColPos = 14; bulletColPos > bulletEndRange; bulletColPos--){
+//     lcd.setCursor(bulletColPos, bulletRowPosition);
+//     lcd.printByte(4);
 
-        // SERIAL DIAGNOSTICS
-        // Serial.print(" |Parent forloop finished running at: ");
-        // Serial.print(currentTime - startingTime);
+//     // HI, I'M THE PROBLEM, IT'S ME
+//     if((currentTime - prevTime) >= 500){ // every half seconds, bullet moves one column; acts as delay
+//       Serial.print(" |millis delay bullet movement... ");
+//       for (int bulletDisplacement = 14; bulletDisplacement > bulletColPos; bulletDisplacement--){ // prints the displacement (" ") of the bullet
+//         lcd.setCursor(bulletColPos + 1, bulletRowPosition);
+//         lcd.printByte(" ");
 
-      // assuming the above code runs <500 ms...... WRONG ASSUMPTION. CODE RUNS IN LESS THAN 150ms
-      if((currentTime - prevTime) >= 500){ // every half seconds, bullet moves one column 
-        for (int bulletDisplacement = 0; bulletDisplacement < bulletColPos; bulletDisplacement++){ // prints the displacement (" ") of the bullet
-          lcd.setCursor(bulletColPos + 1, bulletRowPosition);
-          lcd.printByte(" ");
-        }
-          // SERIAL DIAGNOSTICS
-          Serial.print(" |bulletColPos: ");
-          Serial.print(bulletColPos);
-      //     startingTime = currentTime;
-        prevTime = currentTime;
-      }
+//         // SERIAL DIAGNOSTICS: prints the value of bullet column position
+//         // Serial.print(" |Child forloop displacement: ");
+//         // Serial.print(bulletDisplacement);
+//       }
+//       prevTime = currentTime;
+//     }
 
-      return bulletColPos;
-      
-      /* IMPORTANT NOTE:
-          Using delay halts the loop and other functions.
-          Using lcd.clear() clears all the pixels in the LCS.
-          Using these are for test only.
-      */
-      // delay(50);
-      // lcd.clear();
-    // }
-  }
-}
+//     // SERIAL DIAGNOSTICS: prints the value of bullet column position
+//     // Serial.print(" |bulletColPos: ");
+//     // Serial.print(bulletColPos);
+//     return bulletColPos;
+//   }
+// }
 
 // timeScore func
 int timeScore(int time){
