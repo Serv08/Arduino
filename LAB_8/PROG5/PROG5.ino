@@ -56,6 +56,7 @@ long unsigned prevTime = 0;
 long unsigned parentPrevTime = 0;
 long unsigned childPrevTime = 0;
 bool playAgain;
+unsigned int carPositionFromKey = 0;
 
 
 int lives = 3;
@@ -102,8 +103,7 @@ void loop() {
   lcd.setCursor(0, botRow);
   lcd.print(timeScore(timeInSeconds));
 
-  int carPositionFromKey = carMovement(key);
-  
+
   int enemyBullet = enemy(enemyRandomPosition, timeInMillis);
   // SERIAL DIAGNOSTICS
   Serial.print("|enemyBullet: "); 
@@ -124,11 +124,18 @@ void loop() {
     // HI, I'M THE PROBLEM, IT'S ME
     for (int bulletDisplacement = 14; bulletDisplacement > bulletColPos; bulletDisplacement--){ // prints the displacement (" ") of the bullet
       // if((timeInMillis - childPrevTime) >= childLoopInterval){ // bullet moves one column; millis acts as delay (millis delay)
-      lcd.setCursor(bulletColPos + 1, enemyBullet);
-      lcd.print(" ");
+        lcd.setCursor(bulletColPos + 1, enemyBullet);
+        lcd.print(" ");
+
+        // childPrevTime = timeInMillis;
+        delay(200); //function should be here
+        carPositionFromKey = carMovement(key);
+        Serial.print(" |CarPositionFromKey inside child loop: ");
+        Serial.print(carPositionFromKey);
+      // }
     }
     if (bulletColPos == 3){
-      bulletHit = bulletColPos;
+    bulletHit = bulletColPos;
     }
   }
 
@@ -136,23 +143,23 @@ void loop() {
   // SERIAL DIAGNOSTICS: prints the value of bullet column position
   Serial.print(" |BulletHit: ");
   Serial.print(bulletHit);
-  if ((bulletHit == carDeathPoint) && (carPositionFromKey == enemyRandomPosition)){
-    // lcd.blink();
-    // delay(1000);
-    // deathSound(); // todo: death sound function
-    lives--;
-    Serial.print("  Status: Dead# ");
-    lcd.clear();
-    lcd.home();
-    lcd.print("  You are hit!");
-    lcd.setCursor(2, 1);
-    lcd.print(lives);
-    lcd.print(" lives left");
-    delay(1000);
-    lcd.clear();
-  } else {
-    Serial.print("  Status: Alive ");
-  }
+  // if ((bulletHit == carDeathPoint) && (carPositionFromKey == enemyRandomPosition)){
+  //   // lcd.blink();
+  //   // delay(1000);
+  //   // deathSound(); // todo: death sound function
+  //   lives--;
+  //   Serial.print("  Status: Dead# ");
+  //   lcd.clear();
+  //   lcd.home();
+  //   lcd.print("  You are hit!");
+  //   lcd.setCursor(2, 1);
+  //   lcd.print(lives);
+  //   lcd.print(" lives left");
+  //   delay(1000);
+  //   lcd.clear();
+  // } else {
+  //   Serial.print("  Status: Alive ");
+  // }
 
   Serial.print("  Lives: ");
   Serial.print(lives);
@@ -253,6 +260,8 @@ int enemy(int enemyPosition, long time){
       // return enemyPosition = 1;
     }
     prevTime = cue;
+
+    // returns enemyPositin after n time
     return enemyPosition;
   }  
 }
